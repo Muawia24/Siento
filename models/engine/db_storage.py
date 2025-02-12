@@ -30,3 +30,31 @@ class DB:
 
         Session = sessionmaker(bind=self.__engine)
         self.__session = Session()
+
+    def new(self, obj):
+        """Add object to current database session"""
+        self.__session.add(obj)
+        self.__session.flush()
+
+    def save(self):
+        """Commit changes to the current databases session"""
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        """Delete object from the current database session"""
+        if obj is not None:
+            self.__session.delete(obj)
+    def rollback(self):
+        """rollback changes to the current databases session"""
+        self.__session.rollback()
+
+    def get(self, cls, email):
+        """Returns the object based on the class
+        and its Email, or None if not found """
+        for key, value in self.all_classes.items():
+            if value is cls:
+                try:
+                    return self.__session.query(value).filter(value.email == email).one()
+                except:
+                    return None
+        return None
