@@ -1,8 +1,7 @@
 """ Flask App"""
 from flask import Flask, render_template, redirect, url_for, request, flash
-from flask_login import login_user, login_required, logout_user
-from models import User, Mood
-from models.engine.db_storage import DB
+from flask_login import login_user, login_required, logout_user, current_user
+from db_storage import DB
 import bcrypt
 
 app = Flask(__name__)
@@ -11,11 +10,12 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     ''' Home route'''
-    return render_template('home.html')
+    return render_template('home.html', current_user=current_user)
 
-@app.route('register/', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     """ Register route"""
+    from models.User import User
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -34,9 +34,10 @@ def register():
 
     return render_template('register.html')
 
-@app.route('login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     """Login route"""
+    from models import User
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -50,7 +51,7 @@ def login():
             flash('Invalid email or password.', 'error')
     return render_template('login.html')
 
-@app.route('logout/')
+@app.route('/logout')
 @login_required
 def logout():
     """ Logs the user out"""

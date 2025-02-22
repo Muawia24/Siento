@@ -1,6 +1,6 @@
-""" User mosle"""
+""" User modle"""
 
-from engine.db_storage import Base
+from models.Base import Base
 from flask_login import UserMixin 
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey
 from datetime import datetime

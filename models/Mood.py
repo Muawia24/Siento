@@ -1,7 +1,7 @@
 """ Mood modle"""
 
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey
-from engine.db_storage import Base
+from models.Base import Base
 from datetime import datetime
 
 class Mood(Base):
