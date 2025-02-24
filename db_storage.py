@@ -7,6 +7,9 @@ from models.Base import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DB:
@@ -17,16 +20,14 @@ class DB:
         "Mood": Mood
     }
 
+    db_url = f"mysql+mysqldb://{os.environ['MYSQL_USER']}:{os.environ['MYSQL_PWD']}@{os.environ['MYSQL_HOST']}/{os.environ['MYSQL_DB']}"
+
     __engine = None
     __session = None
 
     def __init__(self):
         """Instatiate the engine and drop if test database"""
-        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}/{}".format(
-            os.environ['MYSQL_USER'],
-            os.environ['MYSQL_PWD'],
-            os.environ['MYSQL_HOST'],
-            os.environ['MYSQL_DB']), pool_pre_ping=True)
+        self.__engine = create_engine(self.db_url, pool_pre_ping=True)
 
         Session = sessionmaker(bind=self.__engine)
         self.__session = Session()

@@ -3,6 +3,7 @@
 from models.Base import Base
 from flask_login import UserMixin 
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 
@@ -18,4 +19,6 @@ attributes
     id = Column(Integer, primary_key=True)
     email = Column(String(255), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    username = Column(String(80), unique=True, nullable=False)
+    full_name = Column(String(120), nullable=True)
+    moods = relationship('Mood', backref='user', lazy=True)
