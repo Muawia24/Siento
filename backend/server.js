@@ -1,6 +1,6 @@
 import process, { send } from 'process';
 import http from 'http';
-import db from './config/db.js';
+import db from './config/db_config.js';
 import app from './app.js';
 import dotenv from 'dotenv';
 

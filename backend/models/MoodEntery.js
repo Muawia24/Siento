@@ -4,8 +4,8 @@ const MoodEntrySchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     date: { type: Date, default: Date.now },
     moodText: { type: String, required: true },
-    analyzedMood: { type: String },  // AI-generated mood category
-    sentimentScore: { type: Number } // AI-generated sentiment score
+    moodScore: { type: Number }, // AI-analyzed mood score (-1 to 1)
+    aiResponse: { type: String }, // AI-generated feedback
 });
 
 const MoodEntry = mongoose.model('MoodEntry', MoodEntrySchema);
