@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import Message from '../models/Message.js';
 
 class DB {
     async connect() {

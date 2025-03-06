@@ -1,6 +1,5 @@
-import axios from axios
-
-require('dotenv').config();
+import axios from 'axios';
+//require('dotenv').config();
 
 const generateResponse = async (text) => {
     try {

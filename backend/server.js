@@ -1,4 +1,4 @@
-import process, { send } from 'process';
+import process from 'process';
 import http from 'http';
 import db from './config/db_config.js';
 import app from './app.js';

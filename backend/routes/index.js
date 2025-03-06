@@ -1,7 +1,7 @@
 import express from 'express';
-import MoodController from '../controllers/MoodController';
-import UsersController from '../controllers/UserController';
-import protect from '../middleware/authMiddleware';
+import MoodController from '../controllers/MoodController.js';
+import UsersController from '../controllers/UserController.js';
+import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -14,7 +14,6 @@ router.post('/forgot-password', UsersController.pwdForgot);
 router.post('/reset-password/:token', UsersController.pwdReset);
 
 router.get('/:userId', protect, MoodController.userHistory);
-router.get('/verify/:token', UsersController.verifyToken);
 
 export default router;
 
