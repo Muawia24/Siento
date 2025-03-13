@@ -24,8 +24,16 @@ export function SignupPage({ onBack, onLogin }: SignupPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url("https://images.unsplash.com/photo-1486946255434-2466348c2166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80")'
+        }}
+      />
+      <div className="absolute inset-0 bg-purple-900/30 backdrop-blur-[2px]" />
+
+      <div className="max-w-md w-full space-y-8 bg-white/95 p-8 rounded-xl shadow-2xl relative z-10">
         <div className="text-center">
           <button onClick={onBack} className="absolute top-8 left-8 text-gray-600 hover:text-gray-800">
             ← Back
@@ -60,7 +68,13 @@ export function SignupPage({ onBack, onLogin }: SignupPageProps) {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {error && (
+            <div className="text-red-500 text-sm text-center">
+              {error}
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
