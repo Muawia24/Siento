@@ -1,39 +1,51 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import { HomePage } from './components/HomePage.tsx';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { JournalPage } from './components/JournalPage.tsx';
+import AuthProvider, { AuthContext } from "./hooks/useAuth";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
-type Page = 'home' | 'login' | 'signup' | 'journal';
+
+function AppRoutes() {
+  const { user, loading, logout  } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen text-xl">Loading...</div>;
+  }
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      {!user ? (
+        <>
+          <Route path="/" element={<HomePage onSignup={() => navigate('/signup')} onLogin={() => navigate('/login')} />} />
+          <Route path="/login" element={<LoginPage onBack={() => navigate('/')} onSignup={() => navigate('/signup')} onLogin={() => navigate('/journal')} />} />
+          <Route path="/signup" element={<SignupPage onBack={() => navigate('/')} onLogin={() => navigate('/login')} /> } />
+        </>
+      ) : (
+        <>
+          {/* Private Routes */}
+          <Route path="/journal" element={<JournalPage onLogout={logout}/>} />
+          <Route path="*" element={<Navigate to="/journal" />} />
+        </>
+      )}
+
+      {/* Default fallback to home if route is not found */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  );
+}
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    setCurrentPage('journal');
-  };
-
-  const renderCurrentPage = () => {
-    if (isAuthenticated && currentPage === 'journal') {
-      return <JournalPage onLogout={() => {
-        setIsAuthenticated(false);
-        setCurrentPage('home');
-      }} />;
-    }
-
-    switch (currentPage) {
-      case 'login':
-        return <LoginPage onBack={() => setCurrentPage('home')} onSignup={() => setCurrentPage('signup')} onLogin={handleLogin} />;
-      case 'signup':
-        return <SignupPage onBack={() => setCurrentPage('home')} onLogin={() => setCurrentPage('login')} />;
-      default:
-        return <HomePage onLogin={() => setCurrentPage('login')} onSignup={() => setCurrentPage('signup')} />;
-    }
-  };
-
-  return renderCurrentPage();
+  return (
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
+  );
 }
 
 export default App;

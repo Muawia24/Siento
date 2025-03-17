@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Brain, Mail, KeyRound } from 'lucide-react';
 import { InputField } from './InputField';
+import { AuthContext } from '../hooks/useAuth';
 
 interface LoginPageProps {
   onBack: () => void;
@@ -12,16 +13,26 @@ export function LoginPage({ onBack, onSignup, onLogin }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { login } = useContext(AuthContext);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+
+    setError(null);
+
     if (!email || !password) {
       setError('Please fill in all fields.');
       return;
     }
     
     // Handle login logic here
+    try{
+      await login(email, password);
+     // onLogin();
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid email or password.");
+    }
+  
     console.log('Login:', { email, password });
   };
 

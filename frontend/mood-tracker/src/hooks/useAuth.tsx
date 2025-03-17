@@ -14,6 +14,7 @@ interface AuthContextType {
     register: (name: string, email: string, password: string) => Promise<void>;
     logout: () => void;
     loading: boolean;
+    error: string | null;
 }
 
 interface AuthProviderProps {
@@ -32,11 +33,13 @@ export const AuthContext = createContext<AuthContextType>({
         console.log("Default logout function called");
     },
     loading: true,
+    error: null,
 });
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
     const [ user, setUser ] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         console.log("AuthProvider useEffect triggered");
@@ -51,6 +54,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }, []);
 
     const login = async (email: string, password: string) => {
+        setError(null);
         console.log(localStorage.getItem('userInfo'));
         console.log("User in AuthContext:", user);
         const { data } = await API.post('/auth/login', { email, password });
@@ -61,6 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     const register = async (name: string, email: string, password: string) => {
+        setError(null);
         const { data } = await API.post('/auth/register', { name, email, password });
 
         setUser(data);
@@ -73,7 +78,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, loading, error }}>
             {!loading && children}
         </AuthContext.Provider>
     );
