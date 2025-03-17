@@ -1,8 +1,9 @@
 import React from 'react';
 import { useState } from 'react';
-import { Smile, Frown, Meh, Sun, CloudRain, CloudSun, Lightbulb, BarChart, Calendar, PenLine, Plus, Brain, TrendingUp } from 'lucide-react';
+import { Smile, Frown, Meh, Lightbulb, BarChart, Calendar, PenLine, Plus, Brain, TrendingUp } from 'lucide-react';
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { useEntries } from '../hooks/useEntries';
 
 ChartJS.register(
   CategoryScale,
@@ -15,86 +16,35 @@ ChartJS.register(
   Legend
 );
 
-const analyzeSentiment = (text: string) => {
-    // Simple mock sentiment analysis
-    const words = text.toLowerCase().split(' ');
-    const positiveWords = ['happy', 'good', 'great', 'excellent', 'amazing', 'wonderful', 'joy'];
-    const negativeWords = ['sad', 'bad', 'terrible', 'awful', 'unhappy', 'frustrated', 'angry'];
-    
-    let score = 0;
-    words.forEach(word => {
-      if (positiveWords.includes(word)) score += 1;
-      if (negativeWords.includes(word)) score -= 1;
-    });
-    
-    return score;
-};
+
 
 type MoodCounts = Record<string, number>;
-type WeatherImpact = Record<string, { count: number; moodSum: number }>;
 
 const generateInsights = (entries: any[]) => {
     const moodCounts: MoodCounts = entries.reduce((acc: any, entry) => {
-      acc[entry.mood] = (acc[entry.mood] || 0) + 1;
+      acc[entry.moodText] = (acc[entry.moodText] || 0) + 1;
       return acc;
     }, {});
   
-    const weatherImpact : WeatherImpact = entries.reduce((acc: any, entry) => {
-      if (!acc[entry.weather]) acc[entry.weather] = { count: 0, moodSum: 0 };
-      acc[entry.weather].count += 1;
-      acc[entry.weather].moodSum += entry.mood === 'happy' ? 1 : entry.mood === 'sad' ? -1 : 0;
-      return acc;
-    }, {});
   
     return {
       moodCounts,
-      weatherImpact,
       totalEntries: entries.length
     };
 };
 
-function JournalPage({ onLogout }: { onLogout: () => void }) {
-  const [selectedDate] = useState(new Date());
-  const [mood, setMood] = useState<'happy' | 'neutral' | 'sad' | null>(null);
-  const [weather, setWeather] = useState<'sunny' | 'cloudy' | 'rainy' | null>(null);
+export function JournalPage({ onLogout }: { onLogout: () => void }) {
+  const { entries, addEntry, error, loading } = useEntries();
   const [journalEntry, setJournalEntry] = useState('');
   const [showAIInsights, setShowAIInsights] = useState(false);
-  const [entries, setEntries] = useState<Array<{
-    id: number;
-    date: Date;
-    mood: string;
-    weather: string;
-    content: string;
-    sentiment: number;
-  }>>([
-    {
-      id: 1,
-      date: new Date(),
-      mood: 'happy',
-      weather: 'sunny',
-      content: 'Today was a productive day! I accomplished all my tasks and had time for self-care.',
-      sentiment: 2
-    }
-  ]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mood || !weather || !journalEntry.trim()) return;
+    if (!journalEntry.trim()) return;
 
-    const sentiment = analyzeSentiment(journalEntry);
-
-    setEntries([...entries, {
-      id: Date.now(),
-      date: selectedDate,
-      mood,
-      weather,
-      content: journalEntry,
-      sentiment
-    }]);
-
+    await addEntry(journalEntry);
+  
     // Reset form
-    setMood(null);
-    setWeather(null);
     setJournalEntry('');
   };
 
@@ -107,7 +57,7 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
     datasets: [
       {
         label: 'Mood Trend',
-        data: entries.map(entry => entry.mood === 'happy' ? 1 : entry.mood === 'sad' ? -1 : 0),
+        data:  entries.map(entry => entry.moodScore > 0 ? 1 : entry.moodScore < 0 ? -1 : 0),
         borderColor: 'rgb(147, 51, 234)',
         backgroundColor: 'rgba(147, 51, 234, 0.5)',
         tension: 0.4
@@ -121,9 +71,9 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
       {
         label: 'Sentiment Distribution',
         data: [
-          entries.filter(e => e.sentiment > 0).length,
-          entries.filter(e => e.sentiment === 0).length,
-          entries.filter(e => e.sentiment < 0).length
+          entries.filter(e => e.moodScore > 0).length,
+          entries.filter(e => e.moodScore === 0).length,
+          entries.filter(e => e.moodScore < 0).length
         ],
         backgroundColor: [
           'rgba(34, 197, 94, 0.6)',
@@ -183,74 +133,6 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
                     How are you feeling today?
                   </label>
                   <div className="flex space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => setMood('happy')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        mood === 'happy' ? 'bg-green-100 text-green-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <Smile className="w-6 h-6" />
-                      <span>Happy</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMood('neutral')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        mood === 'neutral' ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <Meh className="w-6 h-6" />
-                      <span>Neutral</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMood('sad')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        mood === 'sad' ? 'bg-red-100 text-red-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <Frown className="w-6 h-6" />
-                      <span>Sad</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    How's the weather?
-                  </label>
-                  <div className="flex space-x-4">
-                    <button
-                      type="button"
-                      onClick={() => setWeather('sunny')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        weather === 'sunny' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <Sun className="w-6 h-6" />
-                      <span>Sunny</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setWeather('cloudy')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        weather === 'cloudy' ? 'bg-gray-200 text-gray-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <CloudSun className="w-6 h-6" />
-                      <span>Cloudy</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setWeather('rainy')}
-                      className={`p-3 rounded-lg flex items-center space-x-2 ${
-                        weather === 'rainy' ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-600'
-                      }`}
-                    >
-                      <CloudRain className="w-6 h-6" />
-                      <span>Rainy</span>
-                    </button>
                   </div>
                 </div>
 
@@ -347,8 +229,6 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
                     <div className="bg-blue-50 rounded-lg p-4">
                       <h4 className="font-medium text-blue-700 mb-2">Best Weather Impact</h4>
                       <p className="text-2xl font-bold text-blue-900">
-                        {Object.entries(insights.weatherImpact)
-                          .sort((a, b) => (b[1].moodSum / b[1].count) - (a[1].moodSum / a[1].count))[0]?.[0] || 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -367,14 +247,18 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
               </div>
             </div>
 
+            {/* Loading & Error Handling */}
+            {loading && <p className="text-gray-600">Loading...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
             <div className="space-y-4">
               {entries.map((entry) => (
-                <div key={entry.id} className="bg-white rounded-xl shadow-sm p-6">
+                <div key={entry.userId} className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
-                      {entry.mood === 'happy' && <Smile className="w-5 h-5 text-green-500" />}
-                      {entry.mood === 'neutral' && <Meh className="w-5 h-5 text-blue-500" />}
-                      {entry.mood === 'sad' && <Frown className="w-5 h-5 text-red-500" />}
+                     {entry.moodScore > 0  && <Smile className="w-5 h-5 text-green-500" />}
+                      {entry.moodScore === 0 && <Meh className="w-5 h-5 text-blue-500" />}
+                      {entry.moodScore < 0 && <Frown className="w-5 h-5 text-red-500" />}
                       <span className="text-sm text-gray-600">
                         {new Date(entry.date).toLocaleDateString('en-US', {
                           weekday: 'long',
@@ -384,21 +268,19 @@ function JournalPage({ onLogout }: { onLogout: () => void }) {
                         })}
                       </span>
                     </div>
-                    <div>
-                      {entry.weather === 'sunny' && <Sun className="w-5 h-5 text-yellow-500" />}
-                      {entry.weather === 'cloudy' && <CloudSun className="w-5 h-5 text-gray-500" />}
-                      {entry.weather === 'rainy' && <CloudRain className="w-5 h-5 text-blue-500" />}
-                    </div>
+                    
                   </div>
-                  <p className="text-gray-700 whitespace-pre-wrap">{entry.content}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{entry.moodText}</p>
                 </div>
               ))}
             </div>
+
+            {/* No Entries Message */}
+            {entries.length === 0 && !loading && <p className="text-gray-500">No journal entries yet.</p>}
+            
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-export default JournalPage;

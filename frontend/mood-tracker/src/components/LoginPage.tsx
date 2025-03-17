@@ -5,19 +5,22 @@ import { InputField } from './InputField';
 interface LoginPageProps {
   onBack: () => void;
   onSignup: () => void;
+  onLogin: () => void;
 }
 
-export function LoginPage({ onBack, onSignup }: LoginPageProps) {
+export function LoginPage({ onBack, onSignup, onLogin }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onLogin();
     if (!email || !password) {
       setError('Please fill in all fields.');
       return;
     }
+    
     // Handle login logic here
     console.log('Login:', { email, password });
   };
