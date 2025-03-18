@@ -3,6 +3,7 @@ import { HomePage } from './components/HomePage.tsx';
 import { LoginPage } from './components/LoginPage';
 import { SignupPage } from './components/SignupPage';
 import { JournalPage } from './components/JournalPage.tsx';
+import { ProfilePage } from './components/profilePage.tsx';
 import AuthProvider, { AuthContext } from "./hooks/useAuth";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
@@ -27,8 +28,9 @@ function AppRoutes() {
       ) : (
         <>
           {/* Private Routes */}
-          <Route path="/journal" element={<JournalPage onLogout={logout}/>} />
-          <Route path="*" element={<Navigate to="/journal" />} />
+          <Route path="/journal" element={<JournalPage onProfile={() => navigate('/profile')} onLogout={logout}/>} />
+          <Route path="/profile" element={<ProfilePage onBack={() => navigate('/journal')} onLogout={logout} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         </>
       )}
 

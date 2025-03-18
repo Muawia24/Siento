@@ -1,4 +1,4 @@
-import  { createContext, useState, useEffect, ReactNode } from "react";
+import  { createContext, useState, useEffect, ReactNode, useContext } from "react";
 import API from "../utils/api";
 
 interface User {
@@ -6,6 +6,7 @@ interface User {
     token: string;
     name: string;
     email: string;
+    _id: string;
 }
 
 interface AuthContextType {
@@ -36,6 +37,14 @@ export const AuthContext = createContext<AuthContextType>({
     error: null,
 });
 
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+      throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+  };
+
 const AuthProvider = ({ children }: AuthProviderProps) => {
     const [ user, setUser ] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -57,7 +66,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         setError(null);
         console.log(localStorage.getItem('userInfo'));
         console.log("User in AuthContext:", user);
-        const { data } = await API.post('/auth/login', { email, password });
+        const { data } = await API.post('/login', { email, password });
         console.log(JSON.stringify(data));
         localStorage.setItem('userInfo', JSON.stringify(data));
         

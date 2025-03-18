@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import API from "../utils/api";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api";
 
 interface JournalEntry {
     userId: string,
@@ -10,7 +10,7 @@ interface JournalEntry {
     moodScore: number, // AI-analyzed mood score (-1 to 1)
     aiResponse: string, // AI-generated feedback
 }
-export function useEntries() {
+export function useEntries(userId: string | undefined) {
 
     const [entries, setEntries] = useState<JournalEntry[]>([]); // Stores journal entries
     const [loading, setLoading] = useState(false);
@@ -21,9 +21,7 @@ export function useEntries() {
         setError("");
 
         try{
-            const response = await axios.get(`${API_BASE_URL}/entries`, {
-                withCredentials: true
-            });
+            const response = await API.get(`/entries/${userId}`);
 
             setEntries(response.data);
 
@@ -43,14 +41,15 @@ export function useEntries() {
         setError("");
 
         try {
-            const response = await axios.post(`${API_BASE_URL}/entries/new`,
-                { moodText: entryText },
-                { withCredentials: true }
+            console.log(entryText);
+            const response = await API.post(`/entries/new`,
+                { moodText: entryText }
             );
 
             setEntries((prevEntries) => [response.data, ...prevEntries]);
 
         } catch (err) {
+            console.log(err)
             if (axios.isAxiosError(err)) {
                 setError(err.response?.data?.message || "Failed to fetch entries");
             } else {
@@ -65,7 +64,7 @@ export function useEntries() {
 
     useEffect(() => {
         fetchentries();
-    }, []);
+    }, [userId]);
     
     return { entries, loading, error, addEntry, fetchentries };
 }

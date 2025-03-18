@@ -4,6 +4,7 @@ import { Smile, Frown, Meh, Lightbulb, BarChart, Calendar, PenLine, Plus, Brain,
 import { Line, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { useEntries } from '../hooks/useEntries';
+import { useAuth } from '../hooks/useAuth';
 
 ChartJS.register(
   CategoryScale,
@@ -33,15 +34,16 @@ const generateInsights = (entries: any[]) => {
     };
 };
 
-export function JournalPage({ onLogout }: { onLogout: () => void }) {
-  const { entries, addEntry, error, loading } = useEntries();
+export function JournalPage({ onLogout, onProfile }: { onLogout: () => void ;  onProfile: () => void }) {
+  const {user} = useAuth();
+  const { entries, addEntry, error, loading } = useEntries(user?._id);
   const [journalEntry, setJournalEntry] = useState('');
   const [showAIInsights, setShowAIInsights] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!journalEntry.trim()) return;
-
+    console.log(journalEntry);
     await addEntry(journalEntry);
   
     // Reset form
@@ -105,6 +107,12 @@ export function JournalPage({ onLogout }: { onLogout: () => void }) {
               >
                 <Lightbulb className="w-5 h-5" />
                 <span>AI Insights</span>
+              </button>
+              <button
+                onClick={onProfile}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Profile
               </button>
               <button
                 onClick={onLogout}
