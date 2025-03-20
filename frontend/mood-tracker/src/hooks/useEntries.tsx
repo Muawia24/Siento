@@ -16,14 +16,40 @@ export function useEntries(userId: string | undefined) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    const encryptData = (text: string, publicKey: string) => {
+      const key = CryptoJS.enc.Utf8.parse(publicKey.substring(0, 32));
+      const encrypted = CryptoJS.AES.encrypt(text, key, { mode: CryptoJS.mode.ECB});
+      return encrypted.toString();
+    
+    }
+
+    const decryptData = (encryptedText: string) => {
+        const privateKey = localStorage.getItem('privateKey');
+
+        if (!privateKey) {
+            console.error("Private key not found!");
+            return "Error: Cannot decrypt";
+          }
+        
+        const key = CryptoJS.enc.Utf8.parse(privateKey.substring(0, 32));
+        const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { mode: CryptoJS.mode.ECB});
+
+        return decrypted.toString();
+    }
+
     async function fetchentries() {
         setLoading(true);
         setError("");
 
         try{
-            const response = await API.get(`/entries/${userId}`);
+            const { data } = await API.get(`/entries/${userId}`);
 
-            setEntries(response.data);
+            const decryptedEntries = data.map((entry: { moodText: string }) => ({
+                ...entry,
+                moodText: decryptData(entry.moodText)
+            }))
+    
+            setEntries(decryptedEntries);
 
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -41,9 +67,16 @@ export function useEntries(userId: string | undefined) {
         setError("");
 
         try {
+            const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+
+            if (!userInfo || !userInfo.publicKey) {
+                console.error("Public key not found");
+                return;
+              }
+            const encryptedText = encryptData(entryText, userInfo.publicKey);
             console.log(entryText);
             const response = await API.post(`/entries/new`,
-                { moodText: entryText }
+                { moodText: encryptedText }
             );
 
             setEntries((prevEntries) => [response.data, ...prevEntries]);

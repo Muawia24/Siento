@@ -28,7 +28,7 @@ export function LoginPage({ onBack, onSignup, onLogin }: LoginPageProps) {
     // Handle login logic here
     try{
       await login(email, password);
-     // onLogin();
+      onLogin();
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid email or password.");
     }
