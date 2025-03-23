@@ -12,7 +12,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string, publicKey: string, encryptedPrivetKey: string) => Promise<void>;
+    register: (name: string, email: string, password: string) => Promise<void>;
     logout: () => void;
     loading: boolean;
     error: string | null;
@@ -62,27 +62,20 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         setLoading(false);
     }, []);
 
-    const decryptPriveteKey = (encryptedPriveteKey: string, password: string ) => {
-        const bytes = CryptoJS.AES.decrypt(encryptedPriveteKey, password);
-        return bytes.toString(CryptoJS.enc.Utf8);
-    }
-
     const login = async (email: string, password: string) => {
         setError(null);
         console.log(localStorage.getItem('userInfo'));
         console.log("User in AuthContext:", user);
         const { data } = await API.post('/login', { email, password });
-        const privateKey = decryptPriveteKey(data.encryptedPrivateKey, password);
         console.log(JSON.stringify(data));
-        localStorage.setItem("privateKey", privateKey);
         localStorage.setItem('userInfo', JSON.stringify(data));
         
         setUser(data);
     }
 
-    const register = async (name: string, email: string, password: string, publicKey: string, encryptedPrivetKey: string) => {
+    const register = async (name: string, email: string, password: string) => {
         setError(null);
-        const { data } = await API.post('/auth/register', { name, email, password, publicKey, encryptedPrivetKey });
+        const { data } = await API.post('/register', { name, email, password  });
 
         setUser(data);
         localStorage.setItem('userInfo', JSON.stringify(data));

@@ -36,7 +36,7 @@ const generateInsights = (entries: any[]) => {
 
 export function JournalPage({ onLogout, onProfile }: { onLogout: () => void ;  onProfile: () => void }) {
   const {user} = useAuth();
-  const { entries, addEntry, error, loading } = useEntries(user?._id);
+  const { entries = [], addEntry, error, loading } = useEntries(user?._id);
   const [journalEntry, setJournalEntry] = useState('');
   const [showAIInsights, setShowAIInsights] = useState(false);
 

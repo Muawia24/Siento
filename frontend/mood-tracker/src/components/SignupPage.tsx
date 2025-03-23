@@ -2,30 +2,20 @@ import React, { useState, useContext } from 'react';
 import { Brain, User, Mail, KeyRound } from 'lucide-react';
 import { InputField } from './InputField';
 import { AuthContext } from '../hooks/useAuth';
-import nacl from 'tweetnacl';
-import naclUtil from 'tweetnacl-util';
 
 interface SignupPageProps {
   onBack: () => void;
   onLogin: () => void;
+  onRegister: () => void;
 }
 
-const generateKeyPair = () => {
-  const keyPair = nacl.box.keyPair();
-  return {
-    publicKey: naclUtil.encodeBase64(keyPair.publicKey),
-    privetKey: naclUtil.encodeBase64(keyPair.secretKey)
-  };
-};
-
-export function SignupPage({ onBack, onLogin }: SignupPageProps) {
+export function SignupPage({ onBack, onLogin, onRegister }: SignupPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const { register } = useContext(AuthContext);
-  const { publicKey, privetKey } = generateKeyPair();
 
   const handleSubmit =  async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,12 +25,11 @@ export function SignupPage({ onBack, onLogin }: SignupPageProps) {
     }
     // Handle signup logic here
     try {
-      await register(name, email, password, publicKey, privetKey);
-      onLogin()
-
-      localStorage.setItem("privateKey", privetKey);
+      await register(name, email, password);
+      onRegister();
 
     } catch (err: any) {
+      console.log(err);
       setError(err.response?.data?.message || 'Something went wrong');
     }
     console.log('Signup:', { name, email, password });

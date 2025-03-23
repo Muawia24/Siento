@@ -24,7 +24,7 @@ function AppRoutes() {
         <>
           <Route path="/" element={<HomePage onSignup={() => navigate('/signup')} onLogin={() => navigate('/login')} />} />
           <Route path="/login" element={<LoginPage onBack={() => navigate('/')} onSignup={() => navigate('/signup')} onLogin={() => navigate('/journal')} />} />
-          <Route path="/signup" element={<SignupPage onBack={() => navigate('/')} onLogin={() => navigate('/login')} />} />
+          <Route path="/signup" element={<SignupPage onBack={() => navigate('/')} onLogin={() => navigate('/login')} onRegister={() => navigate('/journal')} />} />
         </>
       ) : (
         <>
