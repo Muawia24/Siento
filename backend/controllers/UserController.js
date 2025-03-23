@@ -36,6 +36,8 @@ export default class UsersController {
                 name: newUser.name,
                 email: newUser.email,
                 token: token,
+                encryptedPrivateKey: newUser.encryptedPrivateKey,
+                publicKey: newUser.publicKey
             });
         } catch (error) {
             console.error(error);
@@ -154,5 +156,44 @@ export default class UsersController {
         } catch (error) {
             res.status(500).json({ error: 'Server error' });
         }
+    }
+
+    static async updateProfile(req, res) {
+        try {
+            const user = await User.findById(req.user.id);
+        
+            if (!user) {
+              return res.status(404).json({ error: "User not found" });
+            }
+        
+            // Update fields if provided
+            if (req.body.name) user.name = req.body.name;
+            if (req.body.email) user.email = req.body.email;
+        
+            // Handle password update
+            if (req.body.password) {
+              if (req.body.password.length < 6) {
+                return res.status(400).json({ error: "Password must be at least 6 characters" });
+              }
+              const salt = await bcrypt.genSalt(10);
+              user.password = await bcrypt.hash(req.body.password, salt);
+            }
+        
+            // Save updated user
+            await user.save();
+        
+            res.json({
+              message: "Profile updated successfully",
+              user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+              },
+            });
+        
+          } catch (error) {
+            console.error("Error updating profile:", error);
+            res.status(500).json({ error: "Server error" });
+          }
     }
 }

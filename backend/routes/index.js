@@ -5,7 +5,7 @@ import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/add', protect, MoodController.addNew);
+
 router.post('/register', UsersController.postNew);
 router.post('/login', UsersController.logMe);
 router.post('/verify-email', UsersController.verifyEmail);
@@ -13,7 +13,7 @@ router.get('/verify/:token', UsersController.activate);
 router.post('/forgot-password', UsersController.pwdForgot);
 router.post('/reset-password/:token', UsersController.pwdReset);
 
-router.get('/:userId', protect, MoodController.userHistory);
+router.post('/entries/new', protect, MoodController.addNew);
+router.get('/entries/:userId', protect, MoodController.userHistory);
 
 export default router;
-
