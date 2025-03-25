@@ -3,6 +3,7 @@ import API from "../utils/api";
 import axios from "axios";
 
 interface JournalEntry {
+    _id: string,
     userId: string,
     date: Date,
     moodText: string,
@@ -61,11 +62,23 @@ export function useEntries(userId: string | undefined) {
         }
     }
 
+    async function deleteEntry(entryId: string) {
+        try {
+          // Make API call to delete entry
+          await API.delete(`/entries/delete/${entryId}`);
+          // Refetch entries or update local state
+          // ... implementation depends on your API setup ...
+        } catch (error) {
+          // Handle error
+          console.log(error);
+        }
+      };
+
     // Fetch entries when component mounts
 
     useEffect(() => {
         fetchentries();
     }, [userId]);
     
-    return { entries, loading, error, addEntry, fetchentries };
+    return { entries, loading, error, addEntry, deleteEntry, fetchentries };
 }
