@@ -31,14 +31,14 @@ export default class MoodController {
 
     static async deleteEntry(req, res) {
         try {
-            const journalEntry = await Journal.findById(req.params.id);
+            const journalEntry = await MoodEntry.findById(req.params.id);
         
             if (!journalEntry) {
               return res.status(404).json({ error: "Journal entry not found" });
             }
         
             // Ensure the logged-in user owns the journal entry
-            if (journalEntry.user.toString() !== req.user.id) {
+            if (journalEntry.userId.toString() !== req.user.id) {
               return res.status(401).json({ error: "Not authorized to delete this entry" });
             }
         

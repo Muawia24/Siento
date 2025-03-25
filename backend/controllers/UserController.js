@@ -167,8 +167,9 @@ export default class UsersController {
             }
         
             // Update fields if provided
-            if (req.body.name) user.name = req.body.name;
-            if (req.body.email) user.email = req.body.email;
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+        
         
             // Handle password update
             if (req.body.password) {

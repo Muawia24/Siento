@@ -14,6 +14,7 @@ router.post('/forgot-password', UsersController.pwdForgot);
 router.post('/reset-password/:token', UsersController.pwdReset);
 
 router.post('/entries/new', protect, MoodController.addNew);
+router.delete('/entries/delete/:id', protect, MoodController.deleteEntry);
 router.get('/entries/:userId', protect, MoodController.userHistory);
 
 export default router;
