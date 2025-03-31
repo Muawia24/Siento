@@ -17,6 +17,7 @@ export default class MoodController {
             await newMoodEntry.save();
 
             res.status(201).json({
+                _id: newMoodEntry._id,
                 userId: req.user.id,
                 date: newMoodEntry.date,
                 moodText,
