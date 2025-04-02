@@ -158,43 +158,77 @@ export default class UsersController {
         }
     }
 
+    static async getProfile(req, res) {
+        try {
+            const user = await User.findById(req.user.id).select('-password');
+            if (!user) {
+              return res.status(404).json({ message: 'User not found' });
+            }
+            res.json(user);
+
+        } catch {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+        }
+    }
+
     static async updateProfile(req, res) {
         try {
-            const user = await User.findById(req.user.id);
-        
-            if (!user) {
-              return res.status(404).json({ error: "User not found" });
-            }
-        
-            // Update fields if provided
-            user.name = req.body.name || user.name;
-            user.email = req.body.email || user.email;
-        
-        
-            // Handle password update
-            if (req.body.password) {
-              if (req.body.password.length < 6) {
-                return res.status(400).json({ error: "Password must be at least 6 characters" });
-              }
-              const salt = await bcrypt.genSalt(10);
-              user.password = await bcrypt.hash(req.body.password, salt);
-            }
-        
-            // Save updated user
-            await user.save();
-        
-            res.json({
-              message: "Profile updated successfully",
-              user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-              },
-            });
+            const { name, email, bio, location, website, notificationsEnabled, darkMode } = req.body;
+    
+    const updates = {
+      name,
+      email,
+      bio,
+      location,
+      website,
+      preferences: {
+        notificationsEnabled,
+        darkMode
+      }
+    };
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updates,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    res.json(user);
         
           } catch (error) {
             console.error("Error updating profile:", error);
             res.status(500).json({ error: "Server error" });
+          }
+    }
+
+    static async updateProfilePic(req, res) {
+        try {
+            if (!req.file) {
+              return res.status(400).json({ message: 'No file uploaded' });
+            }
+        
+            const profileImage = `/uploads/profile-images/${req.file.filename}`;
+            const user = await User.findByIdAndUpdate(
+              req.user.id,
+              { profileImage },
+              { new: true }
+            ).select('-password');
+        
+            res.json(user);
+          } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
+          }
+    }
+
+    static async deleteAccount(req, res) {
+        try {
+            await User.findByIdAndDelete(req.user.id);
+            res.json({ message: 'Account deleted successfully' });
+          } catch (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Server error' });
           }
     }
 }

@@ -17,4 +17,9 @@ router.post('/entries/new', protect, MoodController.addNew);
 router.delete('/entries/delete/:id', protect, MoodController.deleteEntry);
 router.get('/entries/:userId', protect, MoodController.userHistory);
 
+router.get('/profile', protect, UsersController.getProfile);
+router.put('/profile-update', protect, UsersController.updateProfile);
+router.put('/profile-update/picture', protect, UsersController.updateProfilePic);
+router.delete('/delete-account', protect, UsersController.deleteAccount);
+
 export default router;
