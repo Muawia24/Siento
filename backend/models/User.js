@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from 'validator';
 
 const userSchema = new mongoose.Schema({
     name: {type: String, required: true},
@@ -19,7 +20,6 @@ const userSchema = new mongoose.Schema({
       },
       website: { 
         type: String, 
-        validate: [validator.isURL, 'Please provide a valid URL'],
         default: '' 
     },
       profileImage: { type: String,

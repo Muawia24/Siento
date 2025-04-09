@@ -2,7 +2,7 @@ import express from 'express';
 import MoodController from '../controllers/MoodController.js';
 import UsersController from '../controllers/UserController.js';
 import protect from '../middleware/authMiddleware.js';
-
+import { upload } from '../utils/multer.js';
 const router = express.Router();
 
 
@@ -19,7 +19,7 @@ router.get('/entries/:userId', protect, MoodController.userHistory);
 
 router.get('/profile', protect, UsersController.getProfile);
 router.put('/profile-update', protect, UsersController.updateProfile);
-router.put('/profile-update/picture', protect, UsersController.updateProfilePic);
+router.put('/profile-update/picture', protect, upload.single('profileImage'), UsersController.updateProfilePic);
 router.delete('/delete-account', protect, UsersController.deleteAccount);
 
 export default router;

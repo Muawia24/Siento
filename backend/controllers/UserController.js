@@ -175,31 +175,35 @@ export default class UsersController {
     static async updateProfile(req, res) {
         try {
             const { name, email, bio, location, website, notificationsEnabled, darkMode } = req.body;
-    
-    const updates = {
-      name,
-      email,
-      bio,
-      location,
-      website,
-      preferences: {
-        notificationsEnabled,
-        darkMode
-      }
-    };
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      updates,
-      { new: true, runValidators: true }
-    ).select('-password');
+            if (req.body.website!== '' && !validator.isURL(req.body.website)) {
+                return res.status(400).json({ message: 'Invalid website URL' });
+            }
 
-    res.json(user);
-        
-          } catch (error) {
+            const updates = {
+            name,
+            email,
+            bio,
+            location,
+            website,
+            preferences: {
+                notificationsEnabled,
+                darkMode
+            }
+            };
+
+            const user = await User.findByIdAndUpdate(
+            req.user.id,
+            updates,
+            { new: true, runValidators: true }
+            ).select('-password');
+
+            res.json(user);
+                
+        } catch (error) {
             console.error("Error updating profile:", error);
             res.status(500).json({ error: "Server error" });
-          }
+        }
     }
 
     static async updateProfilePic(req, res) {
@@ -209,6 +213,7 @@ export default class UsersController {
             }
         
             const profileImage = `/uploads/profile-images/${req.file.filename}`;
+            console.log(profileImage);
             const user = await User.findByIdAndUpdate(
               req.user.id,
               { profileImage },
@@ -216,7 +221,7 @@ export default class UsersController {
             ).select('-password');
         
             res.json(user);
-          } catch (err) {
+        } catch (err) {
             console.error(err);
             res.status(500).json({ message: 'Server error' });
           }
@@ -226,9 +231,9 @@ export default class UsersController {
         try {
             await User.findByIdAndDelete(req.user.id);
             res.json({ message: 'Account deleted successfully' });
-          } catch (err) {
+        } catch (err) {
             console.error(err);
             res.status(500).json({ message: 'Server error' });
-          }
+        }
     }
 }
