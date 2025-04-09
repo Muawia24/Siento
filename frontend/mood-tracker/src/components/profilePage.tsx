@@ -1,5 +1,6 @@
 import { Brain, Sun, Camera, ChevronRight, Bell, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getProfile, updateProfile, uploadProfileImage, deleteAccount } from '../hooks/profile';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(
@@ -15,18 +16,59 @@ ChartJS.register(
 
 
 export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout: () => void }) {
-  const [name, setName] = useState('John Doe');
-  const [email, setEmail] = useState('john@example.com');
-  const [bio, setBio] = useState('UI/UX Designer & Developer');
-  const [location, setLocation] = useState('San Francisco, CA');
-  const [website, setWebsite] = useState('https://johndoe.com');
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80');
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    bio: '',
+    location: '',
+    website: '',
+    notificationsEnabled: true,
+    darkMode: false,
+    profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleSave = () => {
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profData = await getProfile();
+        setProfileData({
+          name: profData.data.name || '',
+          email: profData.data.email || '',
+          bio: profData.data.bio || '',
+          location: profData.data.location || '',
+          website: profData.data.website || '',
+          notificationsEnabled: profData.data.prefrences?.notificationsEnabled ?? true,
+          darkMode: profData.data.prefrences?.darkMode ?? false,
+          profileImage: profData.data.profileImage || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+        });
+      } catch (err: any) {
+        setError(err.message || 'Failed to load profile');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement| HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setProfileData(prev => ({ ...prev, [name]: value }));
+  };
+
+  type ToggleableFields = 'notificationsEnabled' | 'darkMode';
+  const handleToggle = (field: ToggleableFields) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     // Mock save functionality
-    console.log('Saving profile...', {
+    /*console.log('Saving profile...', {
       name,
       email,
       bio,
@@ -34,8 +76,98 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
       website,
       notificationsEnabled,
       darkMode
-    });
+    });*/
+
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const updatedProfile = await updateProfile({
+        name: profileData.name,
+        email: profileData.email,
+        bio: profileData.bio,
+        location: profileData.location,
+        website: profileData.website,
+        prefrences: {
+          notificationsEnabled: profileData.notificationsEnabled,
+          darkMode: profileData.darkMode
+        },
+      });
+      
+      setProfileData(prev => ({
+        ...prev,
+        ...updatedProfile,
+        notificationsEnabled: updatedProfile.data.prefrences?.notificationsEnabled ?? prev.notificationsEnabled,
+        darkMode: updatedProfile.data.prefrences?.darkMode ?? prev.darkMode
+      }));
+    } catch (err: any) {
+      setError(err.message || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  console.log('Profile image path:', profileData.profileImage);
+
+  const handleImageUpload = async (e: any) => {
+    const file = e.target.files[0];
+    console.log(file);
+    if (!file) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const { data } = await uploadProfileImage(file);
+      setProfileData(prev => ({ ...prev, profileImage: data.profileImage }));
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload image');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await deleteAccount();
+      onLogout(); // Call logout after successful deletion
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete account');
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -70,22 +202,28 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
               <div className="absolute -bottom-12 left-8">
                 <div className="relative">
                   <img
-                    src={profileImage}
+                    src={`http://localhost:5000${profileData.profileImage}`}
                     alt="Profile"
                     className="w-24 h-24 rounded-full border-4 border-white"
                   />
-                  <button className="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-md hover:bg-gray-50">
+                  <label className="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-md hover:bg-gray-50 cursor-pointer">
                     <Camera className="w-4 h-4 text-gray-600" />
-                  </button>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-8">
+            <form onSubmit={handleSave} className="space-y-8">
               {/* Profile Content */}
               <div className="pt-16 px-8 pb-8">
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">{name}</h1>
-                <p className="text-gray-600">{email}</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">{profileData.name}</h1>
+                <p className="text-gray-600">{profileData.email}</p>
 
                 {/* Profile Sections */}
                 <div className="mt-8 space-y-6">
@@ -100,8 +238,9 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         <input
                           type="text"
                           id="name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          name="name"
+                          value={profileData.name}
+                          onChange={handleChange}
                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                       </div>
@@ -112,8 +251,9 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         <input
                           type="email"
                           id="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          name="email"
+                          value={profileData.email}
+                          onChange={handleChange}
                           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                       </div>
@@ -123,8 +263,9 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         </label>
                         <textarea
                           id="bio"
-                          value={bio}
-                          onChange={(e) => setBio(e.target.value)}
+                          name="bio"
+                          value={profileData.bio}
+                          onChange={handleChange}
                           rows={3}
                           className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="Tell us about yourself"
@@ -137,8 +278,9 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         <input
                           type="text"
                           id="location"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
+                          name="location"
+                          value={profileData.location}
+                          onChange={handleChange}
                           className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="City, Country"
                         />
@@ -150,8 +292,9 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         <input
                           type="url"
                           id="website"
-                          value={website}
-                          onChange={(e) => setWebsite(e.target.value)}
+                          name="website"
+                          value={profileData.website}
+                          onChange={handleChange}
                           className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           placeholder="https://example.com"
                         />
@@ -173,14 +316,14 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         </div>
                         <button
                           type="button"
-                          onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                          onClick={() => handleToggle('notificationsEnabled')}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            notificationsEnabled ? 'bg-purple-600' : 'bg-gray-200'
+                            profileData.notificationsEnabled ? 'bg-purple-600' : 'bg-gray-200'
                           }`}
                         >
                           <span
                             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                              profileData.notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
                             }`}
                           />
                         </button>
@@ -195,14 +338,14 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
                         </div>
                         <button
                           type="button"
-                          onClick={() => setDarkMode(!darkMode)}
+                          onClick={() => handleToggle('darkMode')}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            darkMode ? 'bg-purple-600' : 'bg-gray-200'
+                            profileData.darkMode ? 'bg-purple-600' : 'bg-gray-200'
                           }`}
                         >
                           <span
                             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              darkMode ? 'translate-x-6' : 'translate-x-1'
+                              profileData.darkMode ? 'translate-x-6' : 'translate-x-1'
                             }`}
                           />
                         </button>
@@ -233,7 +376,12 @@ export function ProfilePage({ onBack, onLogout }: { onBack: () => void; onLogout
               <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-red-600">Danger Zone</h2>
                 <div className="space-y-4">
-                  <button className="w-full flex items-center justify-between py-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <button 
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-between py-4 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <LogOut className="w-5 h-5" />
                       <div>

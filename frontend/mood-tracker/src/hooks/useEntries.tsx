@@ -48,7 +48,7 @@ export function useEntries(userId: string | undefined) {
                 { moodText: entryText }
             );
             console.log(response.data);
-            setEntries((prevEntries = []) => [response.data, ...prevEntries]);
+            return response.data;
 
         } catch (err) {
             console.log(err)
@@ -60,6 +60,8 @@ export function useEntries(userId: string | undefined) {
         } finally {
             setLoading(false);
         }
+
+        return null;
     }
 
     async function deleteEntry(entryId: string) {

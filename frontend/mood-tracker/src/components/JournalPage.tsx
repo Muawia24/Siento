@@ -36,14 +36,14 @@ const generateInsights = (entries: any[]) => {
 
 export function JournalPage({ onLogout, onProfile }: { onLogout: () => void ;  onProfile: () => void }) {
   const {user} = useAuth();
-  const { entries = [], addEntry, deleteEntry, error, loading } = useEntries(user?._id);
+  const { entries = [], addEntry, deleteEntry, error, loading } = useEntries(user?._id) || {};
   const [journalEntry, setJournalEntry] = useState('');
   const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticEntries, setOptimisticEntries] = useState(entries);
 
   useEffect(() => {
-    setOptimisticEntries(optimisticEntries);
+    setOptimisticEntries(entries);
   }, [entries]);
   
 
@@ -51,13 +51,20 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void ;  o
     e.preventDefault();
     if (!journalEntry.trim()) return;
     console.log(journalEntry);
-    await addEntry(journalEntry);
-  
-    // Reset form
+    try {
+      const newEntry = await addEntry(journalEntry);
+      if (newEntry) {
+        setOptimisticEntries((prev) => [newEntry, ...prev]);
+      }
+      // Reset form
     setJournalEntry('');
+    } catch(err) {
+      console.error("Error adding entry:", err);
+    }
   };
 
   const handleDeleteClick = (entryId: string) => {
+    console.log('hereee', entryId);
     setEntryToDelete(entryId);
   };
 
@@ -206,7 +213,7 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void ;  o
                  {error && <p className="text-red-500">{error}</p>}
    
                  <div className="space-y-4">
-                   {entries.map((entry) => (
+                   {optimisticEntries.map((entry) => (
                      <div key={entry._id} className="bg-white rounded-xl shadow-sm p-6 transition-shadow hover:shadow-md">
                        <div className="flex items-center justify-between mb-4">
                          <div className="flex items-center gap-2">
