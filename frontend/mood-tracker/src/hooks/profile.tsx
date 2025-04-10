@@ -11,7 +11,7 @@ export type ProfileData = {
   location?: string;
   website?: string;
   profileImage?: string;
-  prefrences?: {
+  preferences?: {
     notificationsEnabled?: boolean;
     darkMode?: boolean;
   };
