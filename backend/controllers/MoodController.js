@@ -54,10 +54,18 @@ export default class MoodController {
 
     static async userHistory(req, res) {
         try {
-            const moodEntries = await MoodEntry.find({ userId: req.user.id }).sort({ createdAt: -1 });
+            const { startDate, endDate } = req.query;
+            const moodEntries = await MoodEntry.find({ 
+                userId: req.user.id,
+                date: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate)
+                  }
+             }).sort({ date: -1 });
             const decryptedEntries = moodEntries.map(entry => ({
                 ...entry._doc,
                 moodText: decryptData(entry.entryCiphertext),
+                aiResponse: decryptData(entry.aiCiphertext),
             }))
             console.log(decryptedEntries);
             res.json(decryptedEntries);
