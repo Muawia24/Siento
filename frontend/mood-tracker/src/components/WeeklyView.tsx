@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, addWeeks } from 'date-fns';
 import { ArrowLeft, ArrowRight, Calendar, Trash2, Loader2, Smile, Frown, Meh, BookOpen, Sparkles } from 'lucide-react';
 import { useEntries } from '../hooks/useEntries';
@@ -8,12 +7,13 @@ interface WeeklyViewProps {
   entries: any[];
   onDelete: (id: string) => void;
   deletingId: string | null;
+  currentWeek: Date;
+  onWeekChange: (date: Date) => void;
 }
 
-export function WeeklyView({ entries, onDelete, deletingId }: WeeklyViewProps) {
-  const [currentWeek, setCurrentWeek] = useState(new Date());
-   const { user } = useAuth();
-    const { loading } = useEntries(user?._id) || {};
+export function WeeklyView({ entries, onDelete, deletingId, currentWeek, onWeekChange }: WeeklyViewProps) {
+  const { user } = useAuth();
+  const { loading } = useEntries(user?._id) || {};
   
   const weekStart = startOfWeek(currentWeek);
   const weekEnd = endOfWeek(currentWeek);
@@ -28,7 +28,8 @@ export function WeeklyView({ entries, onDelete, deletingId }: WeeklyViewProps) {
   
 
   const navigateWeek = (direction: 'prev' | 'next') => {
-    setCurrentWeek(addWeeks(currentWeek, direction === 'prev' ? -1 : 1));
+    const newWeek = addWeeks(currentWeek, direction === 'prev' ? -1 : 1);
+    onWeekChange(newWeek);
   };
 
   return (

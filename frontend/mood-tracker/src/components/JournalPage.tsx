@@ -20,6 +20,7 @@ import {
 import { useEntries } from '../hooks/useEntries';
 import { useAuth } from '../hooks/useAuth';
 import { WeeklyView } from './WeeklyView';
+import { startOfWeek, endOfWeek, format } from 'date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -73,6 +74,9 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticEntries, setOptimisticEntries] = useState<any[]>(entries);
   //const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+
+  
 
   useEffect(() => {
     setOptimisticEntries(entries);
@@ -119,20 +123,29 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
     setEntryToDelete(null);
   };
 
-  const insights = generateInsights(entries);
+  const handleWeekChange = (newWeek: Date) => {
+    setCurrentWeek(newWeek);
+  };
+
+  const currentWeekEntries = optimisticEntries.filter(entry => {
+    const entryDate = new Date(entry.date);
+    return entryDate >= startOfWeek(currentWeek) && entryDate <= endOfWeek(currentWeek);
+  });
+
+  const insights = generateInsights(currentWeekEntries);
 
   const moodData = {
-    labels: entries.map(entry => 
+    labels: currentWeekEntries.map(entry => 
       new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     ),
     datasets: [
       {
         label: 'Mood Trend',
-        data: entries.map(entry => entry.moodScore),
+        data: currentWeekEntries.map(entry => entry.moodScore),
         borderColor: 'rgb(147, 51, 234)',
         backgroundColor: 'rgba(147, 51, 234, 0.5)',
         tension: 0.4,
-        pointBackgroundColor: entries.map(entry => 
+        pointBackgroundColor: currentWeekEntries.map(entry => 
           entry.moodScore > 0 ? '#4ade80' : 
           entry.moodScore < 0 ? '#f87171' : '#60a5fa'
         )
@@ -146,9 +159,9 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
       {
         label: 'Sentiment Distribution',
         data: [
-          entries.filter(e => e.moodScore > 0).length,
-          entries.filter(e => e.moodScore === 0).length,
-          entries.filter(e => e.moodScore < 0).length
+          currentWeekEntries.filter(e => e.moodScore > 0).length,
+          currentWeekEntries.filter(e => e.moodScore === 0).length,
+          currentWeekEntries.filter(e => e.moodScore < 0).length
         ],
         backgroundColor: [
           'rgba(34, 197, 94, 0.7)',
@@ -268,7 +281,16 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
               )}
 
               {/* Weekly View Component */}
-              <WeeklyView entries={optimisticEntries} onDelete={handleDeleteClick} deletingId={deletingId} />
+              <WeeklyView 
+                entries={optimisticEntries.filter(entry => {
+                  const entryDate = new Date(entry.date);
+                  return entryDate >= startOfWeek(currentWeek) && entryDate <= endOfWeek(currentWeek);
+                })}
+                onDelete={handleDeleteClick}
+                deletingId={deletingId}
+                currentWeek={currentWeek}
+                onWeekChange={handleWeekChange}
+              />
             </div>
           </div>
 
@@ -286,7 +308,7 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
                 <div>
                   <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
                     <TrendingUp className="w-5 h-5 text-purple-600" />
-                    <span>Mood Trends</span>
+                    <span>Mood Trends - Week of {format(startOfWeek(currentWeek), 'MMM d')}</span>
                   </h3>
                   <div className="h-60">
                     <Line
