@@ -1,3 +1,4 @@
+import { startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { useState, useEffect } from "react";
 import API from "../utils/api";
 import axios from "axios";
@@ -8,20 +9,29 @@ interface JournalEntry {
     date: Date,
     moodText: string,
     moodScore: number, // AI-analyzed mood score (-1 to 1)
-    aiCiphertext: string, // AI-generated feedback
+    aiResponse: string, // AI-generated feedback
 }
 export function useEntries(userId: string | undefined) {
 
     const [entries, setEntries] = useState<JournalEntry[]>([]); // Stores journal entries
+    const [currentWeek, setCurrentWeek] = useState(new Date());
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    async function fetchentries() {
+    const weekStart = startOfWeek(currentWeek);
+     const weekEnd = endOfWeek(currentWeek);
+
+    async function fetchentries(weekStart: Date, weekEnd: Date) {
         setLoading(true);
         setError("");
 
         try{
-            const { data } = await API.get(`/entries/${userId}`);
+            const { data } = await API.get(`/entries/${userId}`, {
+                params: {
+                  startDate:weekStart.toISOString(),
+                  endDate: weekEnd.toISOString()
+                }
+                });
             console.log(data);
     
             setEntries(data);
@@ -77,10 +87,10 @@ export function useEntries(userId: string | undefined) {
       };
 
     // Fetch entries when component mounts
-
     useEffect(() => {
-        fetchentries();
+        fetchentries(weekStart, weekEnd);
     }, [userId]);
+
     
     return { entries, loading, error, addEntry, deleteEntry, fetchentries };
 }

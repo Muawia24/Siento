@@ -1,9 +1,9 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { 
-  Smile, Frown, Meh, LogOut, User, BarChart, Trash2, Calendar, 
+  Smile, LogOut, User, BarChart, Calendar, 
   PenLine, Plus, Brain, TrendingUp, Loader2, AlertTriangle, 
-  Activity, BookOpen, XCircle 
+  Activity, BookOpen, XCircle
 } from 'lucide-react';
 import { Line, Bar } from 'react-chartjs-2';
 import { 
@@ -19,6 +19,7 @@ import {
 } from 'chart.js';
 import { useEntries } from '../hooks/useEntries';
 import { useAuth } from '../hooks/useAuth';
+import { WeeklyView } from './WeeklyView';
 
 ChartJS.register(
   CategoryScale,
@@ -33,13 +34,6 @@ ChartJS.register(
 
 type MoodCounts = Record<string, number>;
 type MoodScore = -1 | 0 | 1;
-
-interface eany {
-  _id: string;
-  moodText: string;
-  moodScore: MoodScore;
-  date: string;
-}
 
 const generateInsights = (entries: any[]) => {
   const moodCounts: MoodCounts = entries.reduce((acc, entry) => {
@@ -78,6 +72,7 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
   const [entryToDelete, setEntryToDelete] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticEntries, setOptimisticEntries] = useState<any[]>(entries);
+  //const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setOptimisticEntries(entries);
@@ -221,9 +216,6 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-              </div>
-                
                 <div>
                   <label htmlFor="entry" className="block text-sm font-semibold text-gray-700 mb-3">
                     What's on your mind?
@@ -249,16 +241,10 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
               </form>
             </div>
 
-            {/* Journal Entries Section */}
+            {/* Weekly View Section */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Your Journal History</h2>
-                <div className="relative">
-                  <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-purple-600 transition-colors">
-                    <Calendar className="w-5 h-5" />
-                    <span>Filter by date</span>
-                  </button>
-                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Weekly View</h2>
               </div>
 
               {/* Loading and Error States */}
@@ -281,68 +267,8 @@ export function JournalPage({ onLogout, onProfile }: { onLogout: () => void; onP
                 </div>
               )}
 
-              {/* Entries List */}
-              <div className="space-y-4">
-                {optimisticEntries.length === 0 && !loading && (
-                  <div className="text-center py-12">
-                    <div className="mx-auto h-24 w-24 text-gray-400">
-                      <BookOpen className="w-full h-full opacity-50" />
-                    </div>
-                    <h3 className="mt-2 text-lg font-medium text-gray-900">No journal entries yet</h3>
-                    <p className="mt-1 text-gray-500">Start by adding your first journal entry above.</p>
-                  </div>
-                )}
-
-                {optimisticEntries.map((entry) => (
-                  <div
-                    key={entry._id}
-                    className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 group"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`p-2 rounded-lg ${
-                            entry.moodScore > 0
-                              ? 'bg-green-100 text-green-600'
-                              : entry.moodScore === 0
-                              ? 'bg-blue-100 text-blue-600'
-                              : 'bg-red-100 text-red-600'
-                          }`}
-                        >
-                          {entry.moodScore > 0 ? (
-                            <Smile className="w-5 h-5" />
-                          ) : entry.moodScore === 0 ? (
-                            <Meh className="w-5 h-5" />
-                          ) : (
-                            <Frown className="w-5 h-5" />
-                          )}
-                        </div>
-                        <span className="text-sm font-medium text-gray-500">
-                          {new Date(entry.date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteClick(entry._id)}
-                        disabled={deletingId === entry._id}
-                        className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all duration-200"
-                      >
-                        {deletingId === entry._id ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-5 h-5" />
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{entry.moodText}</p>
-                  </div>
-                ))}
-              </div>
+              {/* Weekly View Component */}
+              <WeeklyView entries={optimisticEntries} onDelete={handleDeleteClick} deletingId={deletingId} />
             </div>
           </div>
 

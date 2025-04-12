@@ -1,4 +1,4 @@
-import { Brain, Sun, Camera, ChevronRight, Bell, LogOut, Loader2, AlertTriangle, User, XCircle } from 'lucide-react';
+import { Brain, Sun, Camera, ChevronRight, Bell, LogOut, Loader2, AlertTriangle, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getProfile, updateProfile, uploadProfileImage, deleteAccount } from '../hooks/profile';
 
