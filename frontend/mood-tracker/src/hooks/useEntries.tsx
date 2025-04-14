@@ -1,4 +1,4 @@
-import { startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { startOfWeek, endOfWeek } from 'date-fns';
 import { useState, useEffect } from "react";
 import API from "../utils/api";
 import axios from "axios";
@@ -14,7 +14,7 @@ interface JournalEntry {
 export function useEntries(userId: string | undefined) {
 
     const [entries, setEntries] = useState<JournalEntry[]>([]); // Stores journal entries
-    const [currentWeek, setCurrentWeek] = useState(new Date());
+    const [currentWeek] = useState(new Date());
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -76,12 +76,9 @@ export function useEntries(userId: string | undefined) {
 
     async function deleteEntry(entryId: string) {
         try {
-          // Make API call to delete entry
           await API.delete(`/entries/delete/${entryId}`);
-          // Refetch entries or update local state
-          // ... implementation depends on your API setup ...
+
         } catch (error) {
-          // Handle error
           console.log(error);
         }
       };

@@ -1,16 +1,16 @@
 import { useContext } from 'react';
-import { HomePage } from './components/HomePage';
-import { LoginPage } from './components/LoginPage';
-import { SignupPage } from './components/SignupPage';
-import { JournalPage } from './components/JournalPage';
-import { ProfilePage } from './components/profilePage';
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { JournalPage } from './pages/JournalPage';
+import { ProfilePage } from './pages/profilePage';
 import AuthProvider, { AuthContext } from "./hooks/useAuth";
 import LogoutHandler from './components/logoutHandler';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 
 
 function AppRoutes() {
-  const { user, loading, logout  } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   if (loading) {

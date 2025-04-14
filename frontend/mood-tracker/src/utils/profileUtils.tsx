@@ -1,5 +1,5 @@
 // api/profile.ts
-import api from '../utils/api'; // Your base API instance
+import api from './api'; // Your base API instance
 import axios, { isAxiosError } from 'axios';
 
 

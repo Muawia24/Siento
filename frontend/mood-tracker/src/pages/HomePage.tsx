@@ -1,5 +1,5 @@
 import { Brain, Sparkles, Calendar, MessageCircle, LineChart, Lock } from 'lucide-react';
-import { FeatureCard } from './FeatureCard';
+import { FeatureCard } from '../components/FeatureCard';
 
 interface HomePageProps {
   onLogin: () => void;
