@@ -1,12 +1,13 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import process from 'process';
 import http from 'http';
 import db from './config/db_config.js';
 import app from './app.js';
-import dotenv from 'dotenv';
 
 const PORT = process.env.PORT || 5000;
-
-dotenv.config();
  
 // Initialies the Monogdb connection
 await db.connect();

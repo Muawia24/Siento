@@ -2,9 +2,6 @@ import nodemailer from 'nodemailer';
 import User from '../models/User.js';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { generateInsights } from './journalUtils.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
