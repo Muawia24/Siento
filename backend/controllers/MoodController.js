@@ -1,19 +1,19 @@
 import MoodEntry from "../models/MoodEntery.js";
-import analyzeMood from "../utils/moodAnalysis.js";
 import generateResponse from "../utils/aiResponse.js";
 import { encryptData, decryptData } from "../utils/encryption.js";
 
 export default class MoodController {
 
+
     static async addNew(req, res) {
         try {
             const { moodText } = req.body;
             console.log(`mood text: ${moodText}`);
-            const moodScore = analyzeMood(moodText); // AI analysis
             const encryptedText = encryptData(moodText);
-            const aiResponse = await generateResponse(moodText); // Hugging Chat AI response
-            const aiCiphertext = encryptData(aiResponse);
-            const newMoodEntry = new MoodEntry({ userId: req.user.id, entryCiphertext: encryptedText, moodScore, aiCiphertext });
+            const aiAnalysis = await generateResponse(moodText); // Hugging Chat AI response
+            console.log("analysis:", aiAnalysis.sentimentScore);
+            const aiCiphertext = encryptData(aiAnalysis.supportResponse);
+            const newMoodEntry = new MoodEntry({ userId: req.user.id, entryCiphertext: encryptedText, moodScore: aiAnalysis.sentimentScore, aiCiphertext });
             await newMoodEntry.save();
 
             res.status(201).json({
@@ -21,8 +21,8 @@ export default class MoodController {
                 userId: req.user.id,
                 date: newMoodEntry.date,
                 moodText,
-                moodScore,
-                aiResponse,
+                moodScore: aiAnalysis.sentimentScore,
+                aiResponse: aiAnalysis.supportResponse,
             });
         } catch (error) {
             console.log(error);
