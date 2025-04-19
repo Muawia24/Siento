@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '765784654645';
 
 if (!ENCRYPTION_KEY) {
   throw new Error("ENCRYPTION_KEY is not defined in environment variables.");

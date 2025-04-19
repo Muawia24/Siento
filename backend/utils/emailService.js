@@ -1,14 +1,31 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import nodemailer from 'nodemailer';
 import User from '../models/User.js';
+import MoodEntry from '../models/MoodEntery.js';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { generateInsights } from './journalUtils.js';
+import { decryptData } from './encryption.js';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    logger: true,
+    debug: true
+});
+
+
+transporter.verify((error) => {
+  if (error) {
+    console.log("cridentials:", process.env.EMAIL_USER, process.env.EMAIL_PASS);
+    console.error('❌ Email server connection failed:', error);
+  } else {
+    console.log('✅ Ready to send emails');
+  }
 });
 
 export const sendEmail = async (to, subject, text) => {
@@ -26,7 +43,7 @@ export const sendWeeklyEmails = async () => {
     const weekEnd = endOfWeek(new Date());
   
     for (const user of users) {
-      const entries = await Entry.find({
+      const entries = await MoodEntry.find({
         userId: user._id,
         date: { $gte: weekStart, $lte: weekEnd },
       });
@@ -38,8 +55,7 @@ export const sendWeeklyEmails = async () => {
         .join('\n');
 
         const htmlContent = `
-            <h1>Your Weekly Mood Summary</h1>
-            <p>Here's how you felt this week (${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}):</p>
+            <p> Hi${user.name}Here's how you felt this week (${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}):</p>
             
             <h2>📊 Stats</h2>
             <ul>
@@ -55,7 +71,7 @@ export const sendWeeklyEmails = async () => {
             ${entries.slice(0, 3).map(entry => `
             <div style="margin-bottom: 15px; border-left: 3px solid #7c3aed; padding-left: 10px;">
                 <p><strong>${format(new Date(entry.date), 'MMM d, h:mm a')}</strong></p>
-                <p>${entry.content}</p>
+		<p>${decryptData(entry.entryCiphertext)}</p>
                 <p>Mood: ${entry.moodScore > 0 ? '😊 Happy' : entry.moodScore === 0 ? '😐 Neutral' : '😞 Sad'}</p>
             </div>
             `).join('')}
@@ -64,8 +80,8 @@ export const sendWeeklyEmails = async () => {
         `;
 
         await transporter.sendMail({
-            from: '"MoodMind Team" <noreply@moodmind.com>',
-            to: email,
+            from: '"Siento Team" <noreply@moodmind.com>',
+            to: user.email,
             subject: `Your Weekly Mood Summary - ${format(new Date(), 'MMMM d, yyyy')}`,
             html: htmlContent,
         });
