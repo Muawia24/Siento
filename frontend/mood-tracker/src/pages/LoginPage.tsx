@@ -7,9 +7,10 @@ interface LoginPageProps {
   onBack: () => void;
   onSignup: () => void;
   onLogin: () => void;
+  onForgotPassword: () => void; 
 }
 
-export function LoginPage({ onBack, onSignup, onLogin }: LoginPageProps) {
+export function LoginPage({ onBack, onSignup, onLogin, onForgotPassword }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +74,15 @@ export function LoginPage({ onBack, onSignup, onLogin }: LoginPageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
+          <div className="flex justify-left">
+            <button
+              type="button"
+              onClick={onForgotPassword}
+              className="text-sm text-purple-600 hover:text-purple-300"
+            >
+              Forgot password?
+            </button>
           </div>
 
           {error && (

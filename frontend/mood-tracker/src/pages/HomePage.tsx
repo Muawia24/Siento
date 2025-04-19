@@ -1,4 +1,4 @@
-import { Brain, Sparkles, Calendar, MessageCircle, LineChart, Lock } from 'lucide-react';
+import { Brain, Sparkles, Calendar, LineChart, Lock, Mail } from 'lucide-react';
 import { FeatureCard } from '../components/FeatureCard';
 
 interface HomePageProps {
@@ -73,9 +73,9 @@ export function HomePage({ onLogin, onSignup }: HomePageProps) {
               description="Track your emotional journey with easy-to-use mood logging and visualization tools."
             />
             <FeatureCard
-              icon={<MessageCircle className="w-6 h-6 text-purple-600" />}
-              title="Guided Journaling"
-              description="Get AI-generated prompts tailored to your emotional state and goals."
+              icon={<Mail className="w-6 h-6 text-purple-600" />}
+              title="Weekly Emails"
+              description="Get Weekly notifications of how you've been feeling last week."
             />
             <FeatureCard
               icon={<LineChart className="w-6 h-6 text-purple-600" />}

@@ -13,6 +13,7 @@ export function SignupPage({ onBack, onLogin, onRegister }: SignupPageProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const { register } = useContext(AuthContext);
@@ -23,7 +24,12 @@ export function SignupPage({ onBack, onLogin, onRegister }: SignupPageProps) {
       setError('Please fill in all fields.');
       return;
     }
-    // Handle signup logic here
+    
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     try {
       await register(name, email, password);
       onRegister();
@@ -78,6 +84,14 @@ export function SignupPage({ onBack, onLogin, onRegister }: SignupPageProps) {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <InputField
+                icon={<KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />}
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
