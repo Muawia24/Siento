@@ -55,7 +55,7 @@ export const sendWeeklyEmails = async () => {
         .join('\n');
 
         const htmlContent = `
-            <p> Hi${user.name}Here's how you felt this week (${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}):</p>
+            <p> Hi ${user.name} Here's how you felt this week (${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}):</p>
             
             <h2>📊 Stats</h2>
             <ul>

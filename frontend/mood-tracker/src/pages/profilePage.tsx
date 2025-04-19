@@ -183,7 +183,7 @@ function NavBar({ onBack, onLogout }: { onBack: () => void; onLogout: () => void
             <div className="flex items-center space-x-2">
               <Brain className="w-7 h-7 text-purple-600" />
               <span className="text-xl font-bold text-gray-900 tracking-tight bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                MoodMind
+                Siento
               </span>
             </div>
           </div>

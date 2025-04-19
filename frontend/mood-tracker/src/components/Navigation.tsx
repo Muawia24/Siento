@@ -14,7 +14,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onProfile, onLogout }) =
         <div className="flex items-center space-x-3">
           <Brain className="w-7 h-7 text-purple-600" />
           <span className="text-2xl font-bold text-gray-900 tracking-tight bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            MoodMind
+            Siento
           </span>
         </div>
         <div className="flex items-center space-x-4">
