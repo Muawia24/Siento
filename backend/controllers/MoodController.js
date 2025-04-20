@@ -57,10 +57,6 @@ export default class MoodController {
             const { startDate, endDate } = req.query;
             const moodEntries = await MoodEntry.find({ 
                 userId: req.user.id,
-                date: {
-                    $gte: new Date(startDate),
-                    $lte: new Date(endDate)
-                  }
              }).sort({ date: -1 });
             const decryptedEntries = moodEntries.map(entry => ({
                 ...entry._doc,

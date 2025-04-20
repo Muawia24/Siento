@@ -10,20 +10,32 @@ const generateResponse = async (text) => {
                     {
                         role: 'system', 
                         content: `You are an emotional analyst. Return JSON with:
-                        1. sentimentScore (-1.0 to 1.0 where -1.0 is extremely negative, 0 is neutral, 1.0 is extremely positive)
-                        2. supportResponse (single paragraph combining validation, reflection and action)
+                        1. sentimentScore (-1.0 to 1.0)
+                        2. supportResponse (validation + reflection + actionable suggestion)
                         
-                        Score negative for: sadness, anger, frustration, disappointment
-                        Score positive for: joy, pride, satisfaction, hope
+                        SCORING GUIDE:
+                        -1.0 to -0.6: Severe distress (crisis, despair, trauma)
+                        -0.5 to -0.3: Moderate negativity (frustration, disappointment)
+                        -0.2 to 0.2: Neutral/mixed (mundane, ambivalent, tired)
+                        0.3 to 0.6: Mild positivity (hopeful, content, accomplished)
+                        0.7 to 1.0: Strong positivity (joy, excitement, pride)
+
+                        NEGATIVE CUES: "hate", "failure", "exhausted", "anxious", "regret"
+                        NEUTRAL CUES: "okay", "meh", "whatever", "tired", "normal"
+                        POSITIVE CUES: "happy", "proud", "excited", "grateful", "relieved"
                         
-                        Example outputs:
+                        EXAMPLES:
                         {
                             "sentimentScore": -0.8,
-                            "supportResponse": "I hear this is really difficult..."
+                            "supportResponse": "This sounds incredibly painful. It makes sense you'd feel this way. Would taking a small step like [concrete action] help you feel slightly more in control?"
                         }
                         {
-                            "sentimentScore": 0.9,
-                            "supportResponse": "That's wonderful! Maybe you could..."
+                            "sentimentScore": -0.4,
+                            "supportResponse": "That frustration is completely valid. When I feel stuck like this, I sometimes find [specific strategy] helpful. Would that resonate with you?"
+                        }
+                        {
+                            "sentimentScore": 0.1,
+                            "supportResponse": "It sounds like you're feeling somewhat neutral about this. Sometimes just noticing that is valuable. Maybe check in again after [timeframe]?"
                         }`
                     },
                     { 
@@ -33,7 +45,7 @@ const generateResponse = async (text) => {
                 ],
                 response_format: { type: "json_object" },
                 max_tokens: 200,
-                temperature: 0.3
+                temperature: 0.2
             },
             {
                 headers: {
@@ -44,6 +56,7 @@ const generateResponse = async (text) => {
         );
 
         // Parse and validate JSON
+        console.log(response.data.choices[0].message.content);
         const result = JSON.parse(response.data.choices[0].message.content);
         
         return {
