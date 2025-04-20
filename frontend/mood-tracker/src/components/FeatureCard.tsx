@@ -4,6 +4,7 @@ interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
+  gradient: string;
 }
 
 export function FeatureCard({ icon, title, description }: FeatureCardProps) {
