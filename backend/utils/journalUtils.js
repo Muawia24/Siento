@@ -11,7 +11,7 @@ export function generateInsights(entries) {
     };
   }
 
-  // 1. Calculate mood distribution
+  // Calculate mood distribution
   const moodCounts = entries.reduce((acc, entry) => {
     const mood = 
       entry.moodScore > 0 ? 'Happy' :
@@ -20,10 +20,10 @@ export function generateInsights(entries) {
     return acc;
   }, {});
 
-  // 2. Calculate average sentiment (-1 to 1)
+  // Calculate average sentiment (-1 to 1)
   const avgSentiment = entries.reduce((sum, entry) => sum + entry.moodScore, 0) / entries.length;
 
-  // 3. Calculate current streak
+  // Calculate current streak
   const sortedEntries = [...entries]
     .sort((a, b) => new Date(b.date) - new Date(a.date));
   
@@ -34,7 +34,6 @@ export function generateInsights(entries) {
     const entryDate = new Date(entry.date);
     
     if (!prevDate || isSameDay(entryDate, prevDate)) {
-      // Same day, doesn't affect streak
       continue;
     }
     
@@ -42,17 +41,16 @@ export function generateInsights(entries) {
       currentStreak++;
       prevDate = entryDate;
     } else {
-      break; // Streak broken
+      break;
     }
   }
 
-  // 4. Calculate weekly mood trend
+  // Calculate weekly mood trend
   const moodTrend = entries.reduce((acc, entry) => {
     const dateStr = new Date(entry.date).toISOString().split('T')[0];
     const existingDay = acc.find(item => item.day === dateStr);
     
     if (existingDay) {
-      // Average scores for the same day
       existingDay.score = (existingDay.score + entry.moodScore) / 2;
     } else {
       acc.push({

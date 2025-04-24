@@ -10,9 +10,9 @@ const emailQueue = new Queue('weekly-emails', {
 
 // Add job to queue (run every Saturday at 9 AM)
 emailQueue.add(
-  {}, // Job data (can be used to pass user IDs)
+  {}, 
   {
-    repeat: { cron: '0 9 * * 6' }, // Cron syntax (Saturday 9 AM)
+    repeat: { cron: '0 9 * * 6' }, // (Saturday 9 AM)
     attempts: 3, // Retry 3 times on failure
     backoff: 5000, // Retry after 5 seconds
   }

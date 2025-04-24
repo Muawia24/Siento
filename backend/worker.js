@@ -5,10 +5,6 @@ import mongoose from 'mongoose';
 import emailQueue from './utils/emailQueue.js';
 import db from './config/db_config.js';
 
-console.log('Environment:', {
-  EMAIL_USER: process.env.EMAIL_USER ? '✅ Loaded' : '❌ Missing',
-  MONGODB_URI: process.env.MONGO_URI ? '✅ Loaded' : '❌ Missing'
-});
 
 // Start the worker
 (async () => {
