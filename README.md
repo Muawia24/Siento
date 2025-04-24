@@ -83,7 +83,7 @@ JWT_SECRET=your_jwt_secret
 
 ## 🎥 Demo
 
-![Video Demo](https://www.linkedin.com/feed/update/urn\:li\:activity:7320814096692473856/)
+[Video Demo](https://www.linkedin.com/feed/update/urn\:li\:activity:7320814096692473856/)
 
 ## 🖼️ Screenshots
 ![Siento Dashboard](https://github.com/Muawia24/Siento/blob/main/frontend/mood-tracker/public/appScreen.png)
