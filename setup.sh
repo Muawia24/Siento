@@ -19,5 +19,5 @@ npm install axios react-router-dom recharts
 cd ..
 
 echo "Setup complete! Use the following commands to run the project:"
-echo "Backend: cd backend && npm run dev"
-echo "Frontend: cd frontend && npm run dev"
+echo "Backend: cd backend && npm start"
+echo "Frontend: cd frontend && npm start"
