@@ -1,4 +1,3 @@
-// types/journal.ts
 export type MoodCounts = Record<string, number>;
 export type MoodScore = -1 | 0 | 1;
 
@@ -7,7 +6,6 @@ export interface JournalEntry {
   date: Date;
   moodText: string;
   moodScore: number;
-  // other fields as needed
 }
 
 export interface Insights {

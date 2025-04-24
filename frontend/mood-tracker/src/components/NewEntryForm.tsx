@@ -1,4 +1,3 @@
-// components/NewEntryForm.tsx
 import React, { useState } from 'react';
 import { PenLine, Plus } from 'lucide-react';
 

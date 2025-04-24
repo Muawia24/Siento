@@ -1,5 +1,4 @@
- // components/ProfileFormField.tsx
- export function ProfileFormField({ 
+export function ProfileFormField({ 
     id, name, label, value, onChange, type = 'text', placeholder = '', textarea = false 
   }: {
     id: string;

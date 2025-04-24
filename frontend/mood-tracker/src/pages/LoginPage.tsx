@@ -25,8 +25,7 @@ export function LoginPage({ onBack, onSignup, onLogin, onForgotPassword }: Login
       setError('Please fill in all fields.');
       return;
     }
-    
-    // Handle login logic here
+
     try{
       await login(email, password);
       onLogin();

@@ -1,4 +1,3 @@
-// utils/journalUtils.ts
 import { startOfWeek, endOfWeek } from 'date-fns';
 import { JournalEntry, Insights, MoodCounts } from '../types/journal';
 

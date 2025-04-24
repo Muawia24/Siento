@@ -7,11 +7,11 @@ const LogoutHandler = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        logout(); // Log the user out
-        navigate('/login'); // Redirect to login page
+        logout(); 
+        navigate('/login');
     }, [logout, navigate]);
 
-    return null; // This component doesn't render anything
+    return null; 
 };
 
 export default LogoutHandler;

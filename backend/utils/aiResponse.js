@@ -55,12 +55,12 @@ const generateResponse = async (text) => {
             }
         );
 
-        // Parse and validate JSON
+        // validate JSON
         console.log(response.data.choices[0].message.content);
         const result = JSON.parse(response.data.choices[0].message.content);
         
         return {
-            sentimentScore: result.sentimentScore ?? 0, // Default to neutral
+            sentimentScore: result.sentimentScore ?? 0,
             supportResponse: result.supportResponse || 
                 "I hear you're struggling. What would help right now? Try journaling for 5 minutes."
         };

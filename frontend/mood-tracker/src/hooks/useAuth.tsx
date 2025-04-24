@@ -2,7 +2,6 @@ import  { createContext, useState, useEffect, ReactNode, useContext } from "reac
 import API from "../utils/api";
 
 interface User {
-    // Define the shape of your user object
     token: string;
     name: string;
     email: string;

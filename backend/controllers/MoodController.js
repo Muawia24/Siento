@@ -10,7 +10,7 @@ export default class MoodController {
             const { moodText } = req.body;
             console.log(`mood text: ${moodText}`);
             const encryptedText = encryptData(moodText);
-            const aiAnalysis = await generateResponse(moodText); // Hugging Chat AI response
+            const aiAnalysis = await generateResponse(moodText);
             console.log("analysis:", aiAnalysis.sentimentScore);
             const aiCiphertext = encryptData(aiAnalysis.supportResponse);
             const newMoodEntry = new MoodEntry({ userId: req.user.id, entryCiphertext: encryptedText, moodScore: aiAnalysis.sentimentScore, aiCiphertext });

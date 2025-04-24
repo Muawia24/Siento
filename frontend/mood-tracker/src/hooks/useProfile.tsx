@@ -1,4 +1,3 @@
-// hooks/useProfile.ts
 import { useState, useEffect } from 'react';
 import { getProfile, updateProfile, uploadProfileImage, deleteAccount } from '../utils/profileUtils';
 

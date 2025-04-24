@@ -1,6 +1,5 @@
-// api/profile.ts
-import api from './api'; // Your base API instance
-import axios, { isAxiosError } from 'axios';
+import api from './api';
+import { isAxiosError } from 'axios';
 
 
 export type ProfileData = {

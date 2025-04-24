@@ -1,4 +1,4 @@
-import { Brain, Sparkles, Calendar, LineChart, Lock, Mail, ChevronRight } from 'lucide-react';
+import { Brain, Sparkles, Calendar, LineChart, Lock, Mail } from 'lucide-react';
 import { FeatureCard } from '../components/FeatureCard';
 
 interface HomePageProps {
@@ -63,14 +63,6 @@ export function HomePage({ onLogin, onSignup }: HomePageProps) {
                 >
                   <Sparkles className="w-5 h-5" />
                   <span>Start Your Journey</span>
-                </button>
-                <button 
-                  className="px-8 py-3.5 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white/10 transition-all 
-                            flex items-center justify-center space-x-2 font-medium shadow-lg hover:shadow-white/20 active:scale-95"
-                  aria-label="See How It Works"
-                >
-                  <span>See How It Works</span>
-                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -209,7 +201,7 @@ export function HomePage({ onLogin, onSignup }: HomePageProps) {
               </button>
             </div>
             <img 
-              src="/video-placeholder.webp" 
+              src="/appScreen.png" 
               alt="Video placeholder" 
               className="w-full h-full object-cover"
               loading="lazy"

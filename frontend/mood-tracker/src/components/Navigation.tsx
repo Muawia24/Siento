@@ -1,4 +1,3 @@
-// components/Navigation.tsx
 import React from 'react';
 import { Brain, User, LogOut } from 'lucide-react';
 

@@ -8,8 +8,8 @@ interface JournalEntry {
     userId: string,
     date: Date,
     moodText: string,
-    moodScore: number, // AI-analyzed mood score (-1 to 1)
-    aiResponse: string, // AI-generated feedback
+    moodScore: number,
+    aiResponse: string,
 }
 export function useEntries(userId: string | undefined) {
 

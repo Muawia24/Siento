@@ -1,4 +1,3 @@
-// components/ProfileHeader.tsx
 import { Camera } from 'lucide-react';
 export function ProfileHeader({ profileImage, onImageUpload }: { 
     profileImage: string; 

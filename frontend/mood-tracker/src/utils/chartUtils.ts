@@ -1,4 +1,3 @@
-// utils/chartUtils.ts
 import { JournalEntry } from '../types/journal';
 
 export const getMoodChartData = (entries: JournalEntry[]) => ({

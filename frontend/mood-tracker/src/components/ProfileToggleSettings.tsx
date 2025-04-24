@@ -1,4 +1,3 @@
-// components/ToggleSetting.ts
 export function ToggleSetting({ 
     icon: Icon, 
     title, 

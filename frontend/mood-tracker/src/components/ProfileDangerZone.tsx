@@ -1,5 +1,4 @@
- // components/DangerZone.tsx
- import { ChevronRight, LogOut, Loader2 } from 'lucide-react';
+import { ChevronRight, LogOut, Loader2 } from 'lucide-react';
  
  export function DangerZone({ 
     onDelete, 

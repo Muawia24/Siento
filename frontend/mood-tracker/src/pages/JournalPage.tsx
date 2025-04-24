@@ -1,4 +1,3 @@
-// pages/JournalPage.tsx
 import React, { useState, useEffect } from 'react';
 import { 
   Smile, BarChart, TrendingUp, AlertTriangle, XCircle, Loader2 

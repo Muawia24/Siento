@@ -1,4 +1,3 @@
-// components/StatsCard.tsx
 import React from 'react';
 import { BookOpen, Smile, Frown, Calendar, Activity } from 'lucide-react';
 import { Insights } from '../types/journal';
