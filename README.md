@@ -71,6 +71,15 @@ cd  frontend/mood-tracker
 npm start
 ```
 
+### Worker Process
+
+
+```bash
+cd backend
+npm run worker
+```
+
+
 ## 🔐 Environment Variables
 
 Create a `.env` file in your root directory with the following keys:
