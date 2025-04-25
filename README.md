@@ -24,8 +24,8 @@ An AI-powered mood tracker that provides empathetic support using Together AI's 
 
 ## 💻 Tech Stack
 
-- **Backend**: Node.js, Express, AI integration
-- **Frontend**: React, Vite, TailwindCSS
+- **Backend**: Node.js, Express, AI integration, redis
+- **Frontend**: React, Vite, TailwindCSS, AXIOS
 - **Database**: MongoDB
 - **Auth**: JWT, OAuth 2.0
 
